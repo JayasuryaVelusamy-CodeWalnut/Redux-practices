@@ -1,5 +1,5 @@
 import React from 'react';
-import { FilterState, SortBy, TimerStatus } from '../types/timer';
+import type { FilterState, SortBy, TimerStatus } from '../types/timer';
 import { Search, Plus } from 'lucide-react';
 
 interface ControlBarProps {

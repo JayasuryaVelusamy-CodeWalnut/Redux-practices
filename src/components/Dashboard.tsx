@@ -1,5 +1,5 @@
 import React, { useReducer, useState, useEffect, useCallback } from 'react';
-import { FilterState, ApiState } from '../types/timer';
+import type { FilterState, ApiState } from '../types/timer';
 import { timerReducer } from '../reducers/timerReducer';
 import { createNewTimer, calculateDashboardStats } from '../utils/timerUtils';
 import { timerApi } from '../services/timerApi';

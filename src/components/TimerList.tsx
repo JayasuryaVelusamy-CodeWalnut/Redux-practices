@@ -1,5 +1,5 @@
 import React from 'react';
-import { Timer, FilterState } from '../types/timer';
+import type { Timer, FilterState } from '../types/timer';
 import { TimerCard } from './TimerCard';
 import { calculateElapsed } from '../utils/timerUtils';
 

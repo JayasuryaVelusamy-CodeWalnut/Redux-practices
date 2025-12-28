@@ -1,5 +1,5 @@
 import React from 'react';
-import { DashboardStats } from '../types/timer';
+import type { DashboardStats } from '../types/timer';
 import { formatTime } from '../utils/timerUtils';
 import { Clock, Play, Pause, Timer as TimerIcon } from 'lucide-react';
 

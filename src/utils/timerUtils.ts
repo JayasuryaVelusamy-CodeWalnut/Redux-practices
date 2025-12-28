@@ -1,6 +1,6 @@
 // Utility functions for timer calculations
 
-import { Timer, DashboardStats } from '../types/timer';
+import type { Timer, DashboardStats } from '../types/timer';
 
 export const generateId = (): string => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

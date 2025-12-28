@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Timer } from '../types/timer';
+import type { Timer } from '../types/timer';
 import { calculateElapsed, formatTime } from '../utils/timerUtils';
 import { Play, Pause, RotateCcw, Trash2, Edit2 } from 'lucide-react';
 

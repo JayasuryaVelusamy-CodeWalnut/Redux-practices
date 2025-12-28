@@ -1,6 +1,6 @@
 // Mock API service to simulate async operations
 
-import { Timer } from '../types/timer';
+import type { Timer } from '../types/timer';
 
 const MOCK_DELAY = 800; // Simulate network delay
 
