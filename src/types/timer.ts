@@ -1,5 +1,3 @@
-// Timer Types for Phase 1 (Without Redux)
-
 export interface Timer {
   id: string;
   name: string;
@@ -37,7 +35,6 @@ export interface ApiState {
   error: string | null;
 }
 
-// Action types for timer reducer
 export type TimerAction =
   | { type: 'ADD_TIMER'; payload: Timer }
   | { type: 'UPDATE_TIMER'; payload: { id: string; updates: Partial<Timer> } }

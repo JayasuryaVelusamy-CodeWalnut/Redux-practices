@@ -74,11 +74,10 @@ export const Dashboard: React.FC = () => {
     const newTimer = createNewTimer(`Timer ${timers.length + 1}`);
     dispatch({ type: 'ADD_TIMER', payload: newTimer });
 
-    // Simulate API call
     try {
       await timerApi.createTimer(newTimer);
-    } catch (error) {
-      console.error('Failed to create timer:', error);
+    } catch {
+      // Error handling is done in the API layer
     }
   };
 

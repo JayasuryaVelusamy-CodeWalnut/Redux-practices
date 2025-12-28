@@ -1,52 +1,71 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import type { Timer } from '../types/timer';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import {
+  startTimer,
+  pauseTimer,
+  resetTimer,
+  updateTimer,
+} from '../store/slices/timersSlice';
+import { toggleSelection } from '../store/slices/selectionSlice';
+import { openConfirmModal } from '../store/slices/uiSlice';
 import { calculateElapsed, formatTime } from '../utils/timerUtils';
 import { Play, Pause, RotateCcw, Trash2, Edit2 } from 'lucide-react';
 
-interface TimerCardProps {
-  timer: Timer;
-  isSelected: boolean;
-  onToggleSelect: (id: string) => void;
-  onStart: (id: string) => void;
-  onPause: (id: string) => void;
-  onReset: (id: string) => void;
-  onDelete: (id: string) => void;
-  onEdit: (id: string, name: string) => void;
+interface TimerCardReduxProps {
+  timerId: string;
 }
 
-export const TimerCard: React.FC<TimerCardProps> = ({
-  timer,
-  isSelected,
-  onToggleSelect,
-  onStart,
-  onPause,
-  onReset,
-  onDelete,
-  onEdit,
-}) => {
+export const TimerCardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
+  const dispatch = useAppDispatch();
+
+  const timer = useAppSelector((state) =>
+    state.timers.items.find((t) => t.id === timerId)
+  );
+  const isSelected = useAppSelector((state) =>
+    state.selection.selectedIds.includes(timerId)
+  );
+
   const [tick, setTick] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(timer.name);
+  const [editName, setEditName] = useState(timer?.name || '');
 
-  const currentElapsed = useMemo(() => calculateElapsed(timer), [timer, tick]);
+  const currentElapsed = useMemo(
+    () => (timer ? calculateElapsed(timer) : 0),
+    [timer, tick]
+  );
 
   useEffect(() => {
-    if (timer.status === 'running') {
+    if (timer?.status === 'running') {
       const interval = setInterval(() => {
         setTick((t) => t + 1);
       }, 100);
       return () => clearInterval(interval);
     }
-  }, [timer.status]);
+  }, [timer?.status]);
+
+  if (!timer) return null;
 
   const handleSaveEdit = () => {
     if (editName.trim()) {
-      onEdit(timer.id, editName.trim());
+      dispatch(
+        updateTimer({ id: timerId, updates: { name: editName.trim() } })
+      );
     }
     setIsEditing(false);
   };
 
-  const statusColors = {
+  const handleDelete = () => {
+    dispatch(
+      openConfirmModal({
+        title: 'Delete Timer',
+        message: 'Are you sure you want to delete this timer?',
+        onConfirmAction: 'timers/deleteTimer',
+        actionPayload: timerId,
+      })
+    );
+  };
+
+  const statusColors: Record<string, string> = {
     idle: 'border-gray-300 bg-white',
     running: 'border-green-500 bg-green-50',
     paused: 'border-yellow-500 bg-yellow-50',
@@ -63,7 +82,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
           <input
             type="checkbox"
             checked={isSelected}
-            onChange={() => onToggleSelect(timer.id)}
+            onChange={() => dispatch(toggleSelection(timerId))}
             className="w-4 h-4 cursor-pointer"
           />
           {isEditing ? (
@@ -100,7 +119,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
       <div className="flex items-center justify-center gap-2">
         {timer.status !== 'running' ? (
           <button
-            onClick={() => onStart(timer.id)}
+            onClick={() => dispatch(startTimer(timerId))}
             className="flex items-center gap-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           >
             <Play className="w-4 h-4" />
@@ -108,7 +127,7 @@ export const TimerCard: React.FC<TimerCardProps> = ({
           </button>
         ) : (
           <button
-            onClick={() => onPause(timer.id)}
+            onClick={() => dispatch(pauseTimer(timerId))}
             className="flex items-center gap-1 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
           >
             <Pause className="w-4 h-4" />
@@ -116,13 +135,13 @@ export const TimerCard: React.FC<TimerCardProps> = ({
           </button>
         )}
         <button
-          onClick={() => onReset(timer.id)}
+          onClick={() => dispatch(resetTimer(timerId))}
           className="flex items-center gap-1 px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
         >
           <RotateCcw className="w-4 h-4" />
         </button>
         <button
-          onClick={() => onDelete(timer.id)}
+          onClick={handleDelete}
           className="flex items-center gap-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
         >
           <Trash2 className="w-4 h-4" />

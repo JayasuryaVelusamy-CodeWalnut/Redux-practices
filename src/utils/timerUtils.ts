@@ -1,5 +1,3 @@
-// Utility functions for timer calculations
-
 import type { Timer, DashboardStats } from '../types/timer';
 
 export const generateId = (): string => {

@@ -1,12 +1,9 @@
-// Mock API service to simulate async operations
-
 import type { Timer } from '../types/timer';
 
-const MOCK_DELAY = 800; // Simulate network delay
+const MOCK_DELAY = 800;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Simulate API responses
 export const timerApi = {
   async fetchTimers(): Promise<Timer[]> {
     await delay(MOCK_DELAY);

@@ -1,5 +1,3 @@
-// Timer reducer for Phase 1 (Without Redux)
-
 import type { Timer, TimerAction } from '../types/timer';
 
 export const timerReducer = (state: Timer[], action: TimerAction): Timer[] => {

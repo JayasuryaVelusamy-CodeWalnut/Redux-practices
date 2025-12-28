@@ -1,8 +1,8 @@
-import { Dashboard } from './components/Dashboard';
+import { DashboardRedux } from './components/DashboardRedux';
 import './App.css';
 
 function App() {
-  return <Dashboard />;
+  return <DashboardRedux />;
 }
 
 export default App;
