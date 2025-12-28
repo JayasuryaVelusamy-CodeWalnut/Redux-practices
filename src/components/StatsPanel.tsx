@@ -2,61 +2,114 @@ import React from 'react';
 import type { DashboardStats } from '../types/timer';
 import { formatTime } from '../utils/timerUtils';
 import { Clock, Play, Pause, Timer as TimerIcon } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface StatsPanelProps {
   stats: DashboardStats;
 }
 
 export const StatsPanel: React.FC<StatsPanelProps> = ({ stats }) => {
+  const { colorTheme } = useTheme();
+
+  const themeTotalTimeColors = {
+    blue: {
+      bg: 'bg-blue-50 dark:bg-blue-900/20',
+      border: 'border-blue-200 dark:border-blue-800',
+      text: 'text-blue-700 dark:text-blue-400',
+    },
+    green: {
+      bg: 'bg-green-50 dark:bg-green-900/20',
+      border: 'border-green-200 dark:border-green-800',
+      text: 'text-green-700 dark:text-green-400',
+    },
+    red: {
+      bg: 'bg-red-50 dark:bg-red-900/20',
+      border: 'border-red-200 dark:border-red-800',
+      text: 'text-red-700 dark:text-red-400',
+    },
+  };
+
+  const currentTheme = themeTotalTimeColors[colorTheme];
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-      <div className="bg-white border-2 border-gray-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-gray-600 mb-1">
-          <TimerIcon className="w-4 h-4" />
-          <span className="text-sm">Total Timers</span>
+    <section
+      className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6"
+      aria-label="Dashboard statistics"
+    >
+      <div
+        className={`border-2 rounded-xl p-5 shadow-soft hover:shadow-medium transition-shadow ${currentTheme.bg} ${currentTheme.border}`}
+      >
+        <div className={`flex items-center gap-2 mb-2 ${currentTheme.text}`}>
+          <TimerIcon className="w-5 h-5" aria-hidden="true" />
+          <span className="text-sm font-medium">Total Timers</span>
         </div>
-        <div className="text-2xl font-bold">{stats.totalTimers}</div>
+        <div
+          className={`text-3xl font-bold ${currentTheme.text}`}
+          aria-label={`${stats.totalTimers} total timers`}
+        >
+          {stats.totalTimers}
+        </div>
       </div>
 
-      <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-green-700 mb-1">
-          <Play className="w-4 h-4" />
-          <span className="text-sm">Running</span>
+      <div
+        className={`border-2 rounded-xl p-5 shadow-soft hover:shadow-medium transition-shadow ${currentTheme.bg} ${currentTheme.border}`}
+      >
+        <div className={`flex items-center gap-2 mb-2 ${currentTheme.text}`}>
+          <Play className="w-5 h-5" aria-hidden="true" />
+          <span className="text-sm font-medium">Running</span>
         </div>
-        <div className="text-2xl font-bold text-green-700">
+        <div
+          className={`text-3xl font-bold ${currentTheme.text}`}
+          aria-label={`${stats.runningCount} running timers`}
+        >
           {stats.runningCount}
         </div>
       </div>
 
-      <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-yellow-700 mb-1">
-          <Pause className="w-4 h-4" />
-          <span className="text-sm">Paused</span>
+      <div
+        className={`border-2 rounded-xl p-5 shadow-soft hover:shadow-medium transition-shadow ${currentTheme.bg} ${currentTheme.border}`}
+      >
+        <div className={`flex items-center gap-2 mb-2 ${currentTheme.text}`}>
+          <Pause className="w-5 h-5" aria-hidden="true" />
+          <span className="text-sm font-medium">Paused</span>
         </div>
-        <div className="text-2xl font-bold text-yellow-700">
+        <div
+          className={`text-3xl font-bold ${currentTheme.text}`}
+          aria-label={`${stats.pausedCount} paused timers`}
+        >
           {stats.pausedCount}
         </div>
       </div>
 
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-blue-700 mb-1">
-          <Clock className="w-4 h-4" />
-          <span className="text-sm">Total Time</span>
+      <div
+        className={`border-2 rounded-xl p-5 shadow-soft hover:shadow-medium transition-shadow ${currentTheme.bg} ${currentTheme.border}`}
+      >
+        <div className={`flex items-center gap-2 mb-2 ${currentTheme.text}`}>
+          <Clock className="w-5 h-5" aria-hidden="true" />
+          <span className="text-sm font-medium">Total Time</span>
         </div>
-        <div className="text-lg font-bold text-blue-700">
+        <div
+          className={`text-lg font-bold ${currentTheme.text}`}
+          aria-label={`Total elapsed time: ${formatTime(stats.totalElapsed)}`}
+        >
           {formatTime(stats.totalElapsed)}
         </div>
       </div>
 
-      <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-purple-700 mb-1">
-          <Clock className="w-4 h-4" />
-          <span className="text-sm">Longest</span>
+      <div
+        className={`border-2 rounded-xl p-5 shadow-soft hover:shadow-medium transition-shadow ${currentTheme.bg} ${currentTheme.border}`}
+      >
+        <div className={`flex items-center gap-2 mb-2 ${currentTheme.text}`}>
+          <Clock className="w-5 h-5" aria-hidden="true" />
+          <span className="text-sm font-medium">Longest</span>
         </div>
-        <div className="text-sm font-bold text-purple-700">
+        <div
+          className={`text-sm font-bold ${currentTheme.text}`}
+          aria-label={`Longest running timer: ${stats.longestRunningTimer ? stats.longestRunningTimer.name : 'None'}`}
+        >
           {stats.longestRunningTimer ? stats.longestRunningTimer.name : 'N/A'}
         </div>
       </div>
-    </div>
+    </section>
   );
 };

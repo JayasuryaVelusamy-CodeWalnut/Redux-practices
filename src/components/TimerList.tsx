@@ -60,9 +60,15 @@ export const TimerList: React.FC<TimerListProps> = ({
 
   if (sortedTimers.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <p className="text-lg">No timers found</p>
-        <p className="text-sm mt-2">
+      <div
+        className="text-center py-16 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-soft"
+        role="status"
+        aria-live="polite"
+      >
+        <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          No timers found
+        </p>
+        <p className="text-base mt-2">
           {filters.searchQuery || filters.status !== 'all'
             ? 'Try adjusting your filters'
             : 'Create a new timer to get started'}
@@ -72,7 +78,11 @@ export const TimerList: React.FC<TimerListProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <section
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+      aria-label="List of timers"
+      role="list"
+    >
       {sortedTimers.map((timer) => (
         <TimerCard
           key={timer.id}
@@ -86,6 +96,6 @@ export const TimerList: React.FC<TimerListProps> = ({
           onEdit={onEdit}
         />
       ))}
-    </div>
+    </section>
   );
 };

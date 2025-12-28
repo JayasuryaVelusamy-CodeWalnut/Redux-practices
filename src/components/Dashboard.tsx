@@ -8,7 +8,9 @@ import { ControlBar } from './ControlBar';
 import { BulkActionBar } from './BulkActionBar';
 import { TimerList } from './TimerList';
 import { ConfirmationModal } from './ConfirmationModal';
+import { ThemeSwitcher } from './ThemeSwitcher';
 import { Loader2, AlertCircle } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
 // ⚠️ WARNING: This is Phase 1 implementation with intentional anti-patterns!
 // Problems to observe:
@@ -19,6 +21,7 @@ import { Loader2, AlertCircle } from 'lucide-react';
 // 5. Difficult to test - everything coupled
 
 export const Dashboard: React.FC = () => {
+  const { colorTheme } = useTheme();
   // Multiple pieces of state - state explosion!
   const [timers, dispatch] = useReducer(timerReducer, []);
   const [filters, setFilters] = useState<FilterState>({
@@ -189,32 +192,81 @@ export const Dashboard: React.FC = () => {
     return true;
   });
 
+  const themeLoaderColors = {
+    blue: 'text-blue-500 dark:text-blue-400',
+    green: 'text-green-500 dark:text-green-400',
+    red: 'text-red-500 dark:text-red-400',
+  };
+
   if (apiState.isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div
+        className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading timers"
+      >
+        <Loader2
+          className={`w-8 h-8 animate-spin ${themeLoaderColors[colorTheme]}`}
+          aria-hidden="true"
+        />
+        <span className="sr-only">Loading timers, please wait...</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors">
+      {/* Theme Switcher - Fixed Position */}
+      <ThemeSwitcher />
+
+      {/* Debug indicator - Remove after testing */}
+      <div className="fixed bottom-4 left-4 px-3 py-1 bg-white dark:bg-gray-900 border-2 border-gray-300 dark:border-gray-600 rounded text-xs font-mono">
+        <span className="text-gray-900 dark:text-gray-100">
+          Mode:{' '}
+          {typeof document !== 'undefined' &&
+          document.documentElement.classList.contains('dark')
+            ? 'Dark'
+            : 'Light'}
+        </span>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
+        {/* Header with improved semantics */}
+        <header className="mb-8" role="banner">
+          <h1
+            className={`text-4xl font-bold mb-2 tracking-tight transition-colors ${
+              colorTheme === 'blue'
+                ? 'text-blue-700 dark:text-blue-400'
+                : colorTheme === 'green'
+                  ? 'text-green-700 dark:text-green-400'
+                  : 'text-red-700 dark:text-red-400'
+            }`}
+          >
             Timer & Productivity Dashboard
           </h1>
-          <p className="text-gray-600">
+          <p
+            className="text-gray-600 dark:text-gray-400 text-lg"
+            role="doc-subtitle"
+          >
             Phase 1: Without Redux (Observe the prop drilling!)
           </p>
         </header>
 
-        {/* Error Banner */}
+        {/* Error Banner with ARIA live region */}
         {apiState.error && (
-          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-            <span className="text-red-700">{apiState.error}</span>
+          <div
+            className="mb-6 p-4 bg-danger-50 dark:bg-danger-900/20 border-2 border-danger-200 dark:border-danger-800 rounded-lg flex items-center gap-3 shadow-soft animate-slide-up"
+            role="alert"
+            aria-live="assertive"
+          >
+            <AlertCircle
+              className="w-5 h-5 text-danger-500 dark:text-danger-400 flex-shrink-0"
+              aria-hidden="true"
+            />
+            <span className="text-danger-700 dark:text-danger-300 font-medium">
+              {apiState.error}
+            </span>
           </div>
         )}
 
