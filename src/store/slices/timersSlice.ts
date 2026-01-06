@@ -24,7 +24,9 @@ const timersSlice = createSlice({
       state,
       action: PayloadAction<{ id: string; updates: Partial<Timer> }>
     ) => {
-      const index = state.items.findIndex((t) => t.id === action.payload.id);
+      const index = state.items.findIndex(
+        (timer) => timer.id === action.payload.id
+      );
       if (index !== -1) {
         state.items[index] = {
           ...state.items[index],
@@ -33,10 +35,12 @@ const timersSlice = createSlice({
       }
     },
     deleteTimer: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter((t) => t.id !== action.payload);
+      state.items = state.items.filter((timer) => timer.id !== action.payload);
     },
     deleteTimers: (state, action: PayloadAction<string[]>) => {
-      state.items = state.items.filter((t) => !action.payload.includes(t.id));
+      state.items = state.items.filter(
+        (timer) => !action.payload.includes(timer.id)
+      );
     },
     setTimers: (state, action: PayloadAction<Timer[]>) => {
       state.items = action.payload;
@@ -45,22 +49,22 @@ const timersSlice = createSlice({
     },
 
     startTimer: (state, action: PayloadAction<string>) => {
-      const timer = state.items.find((t) => t.id === action.payload);
+      const timer = state.items.find((timer) => timer.id === action.payload);
       if (timer) {
         timer.status = 'running';
         timer.startTime = Date.now();
       }
     },
     pauseTimer: (state, action: PayloadAction<string>) => {
-      const timer = state.items.find((t) => t.id === action.payload);
-      if (timer && timer.status === 'running' && timer.startTime) {
+      const timer = state.items.find((timer) => timer.id === action.payload);
+      if (timer?.status === 'running' && timer.startTime) {
         timer.elapsed = timer.elapsed + (Date.now() - timer.startTime);
         timer.status = 'paused';
         timer.startTime = null;
       }
     },
     resetTimer: (state, action: PayloadAction<string>) => {
-      const timer = state.items.find((t) => t.id === action.payload);
+      const timer = state.items.find((timer) => timer.id === action.payload);
       if (timer) {
         timer.elapsed = 0;
         timer.startTime = null;
@@ -103,7 +107,59 @@ const timersSlice = createSlice({
       state.isLoading = false;
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchTimersThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchTimersThunk.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(fetchTimersThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = (action.payload as string) || 'Failed to fetch timers';
+      })
+      .addCase(createTimerThunk.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(createTimerThunk.fulfilled, (state, action) => {
+        state.items.push(action.payload);
+        state.isLoading = false;
+      })
+      .addCase(createTimerThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = (action.payload as string) || 'Failed to create timer';
+      })
+      .addCase(updateTimerThunk.fulfilled, (state, action) => {
+        const index = state.items.findIndex((t) => t.id === action.payload.id);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+      })
+      .addCase(bulkUpdateTimersThunk.fulfilled, (state, action) => {
+        action.payload.forEach((updatedTimer) => {
+          const index = state.items.findIndex((t) => t.id === updatedTimer.id);
+          if (index !== -1) {
+            state.items[index] = updatedTimer;
+          }
+        });
+      })
+      .addCase(deleteTimersThunk.fulfilled, (state, action) => {
+        state.items = state.items.filter((t) => !action.payload.includes(t.id));
+      });
+  },
 });
+
+import {
+  fetchTimers as fetchTimersThunk,
+  createTimerAsync as createTimerThunk,
+  updateTimerAsync as updateTimerThunk,
+  bulkUpdateTimersAsync as bulkUpdateTimersThunk,
+  deleteTimersAsync as deleteTimersThunk,
+} from '../thunks/timerThunks';
 
 export const {
   addTimer,
@@ -120,5 +176,14 @@ export const {
   setLoading,
   setError,
 } = timersSlice.actions;
+
+export const selectTimersState = (state: { timers: TimersState }) =>
+  state.timers;
+export const selectAllTimers = (state: { timers: TimersState }) =>
+  state.timers.items;
+export const selectTimersLoading = (state: { timers: TimersState }) =>
+  state.timers.isLoading;
+export const selectTimersError = (state: { timers: TimersState }) =>
+  state.timers.error;
 
 export default timersSlice.reducer;

@@ -1,5 +1,6 @@
 import { createSelector } from 'reselect';
-import type { RootState } from '../store';
+import type { RootState } from './index';
+import type { Timer } from '../types/timer';
 import { calculateElapsed, calculateDashboardStats } from '../utils/timerUtils';
 
 export const selectTimers = (state: RootState) => state.timers.items;
@@ -11,7 +12,7 @@ export const selectTimersError = (state: RootState) => state.timers.error;
 
 export const selectFilteredAndSortedTimers = createSelector(
   [selectTimers, selectFilters],
-  (timers, filters) => {
+  (timers: Timer[], filters: ReturnType<typeof selectFilters>) => {
     const filtered = timers.filter((timer) => {
       if (filters.status !== 'all' && timer.status !== filters.status) {
         return false;
@@ -27,14 +28,14 @@ export const selectFilteredAndSortedTimers = createSelector(
       return true;
     });
 
-    const sorted = [...filtered].sort((a, b) => {
+    const sorted = [...filtered].sort((timerA, timerB) => {
       switch (filters.sortBy) {
         case 'createdAt':
-          return b.createdAt - a.createdAt;
+          return timerB.createdAt - timerA.createdAt;
         case 'elapsed':
-          return calculateElapsed(b) - calculateElapsed(a);
+          return calculateElapsed(timerB) - calculateElapsed(timerA);
         case 'name':
-          return a.name.localeCompare(b.name);
+          return timerA.name.localeCompare(timerB.name);
         default:
           return 0;
       }
@@ -44,20 +45,23 @@ export const selectFilteredAndSortedTimers = createSelector(
   }
 );
 
-export const selectDashboardStats = createSelector([selectTimers], (timers) => {
-  return calculateDashboardStats(timers);
-});
+export const selectDashboardStats = createSelector(
+  [selectTimers],
+  (timers: Timer[]) => {
+    return calculateDashboardStats(timers);
+  }
+);
 
 export const selectIsAllSelected = createSelector(
   [selectTimers, selectSelectedIds],
-  (timers, selectedIds) => {
+  (timers: Timer[], selectedIds: string[]) => {
     return timers.length > 0 && selectedIds.length === timers.length;
   }
 );
 
 export const selectSelectedTimers = createSelector(
   [selectTimers, selectSelectedIds],
-  (timers, selectedIds) => {
+  (timers: Timer[], selectedIds: string[]) => {
     return timers.filter((timer) => selectedIds.includes(timer.id));
   }
 );

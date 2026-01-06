@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Timer, FilterState } from '../types/timer';
-import { TimerCard } from './TimerCard';
-import { calculateElapsed } from '../utils/timerUtils';
+import type { Timer, FilterState } from '../../../types/timer';
+import { Card } from '../../common/Card/Card';
+import { calculateElapsed } from '../../../utils/timerUtils';
 
 interface TimerListProps {
   timers: Timer[];
@@ -26,14 +26,11 @@ export const TimerList: React.FC<TimerListProps> = ({
   onDelete,
   onEdit,
 }) => {
-  // Filter timers
   const filteredTimers = timers.filter((timer) => {
-    // Status filter
     if (filters.status !== 'all' && timer.status !== filters.status) {
       return false;
     }
 
-    // Search filter
     if (
       filters.searchQuery &&
       !timer.name.toLowerCase().includes(filters.searchQuery.toLowerCase())
@@ -44,7 +41,6 @@ export const TimerList: React.FC<TimerListProps> = ({
     return true;
   });
 
-  // Sort timers
   const sortedTimers = [...filteredTimers].sort((a, b) => {
     switch (filters.sortBy) {
       case 'createdAt':
@@ -74,7 +70,7 @@ export const TimerList: React.FC<TimerListProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {sortedTimers.map((timer) => (
-        <TimerCard
+        <Card
           key={timer.id}
           timer={timer}
           isSelected={selectedIds.has(timer.id)}

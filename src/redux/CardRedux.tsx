@@ -15,11 +15,11 @@ interface TimerCardReduxProps {
   timerId: string;
 }
 
-export const TimerCardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
+export const CardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
   const dispatch = useAppDispatch();
 
   const timer = useAppSelector((state) =>
-    state.timers.items.find((t) => t.id === timerId)
+    state.timers.items.find((timer) => timer.id === timerId)
   );
   const isSelected = useAppSelector((state) =>
     state.selection.selectedIds.includes(timerId)
@@ -31,13 +31,13 @@ export const TimerCardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
 
   const currentElapsed = useMemo(
     () => (timer ? calculateElapsed(timer) : 0),
-    [timer, tick]
+    [timer, tick] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   useEffect(() => {
     if (timer?.status === 'running') {
       const interval = setInterval(() => {
-        setTick((t) => t + 1);
+        setTick((previousTick) => previousTick + 1);
       }, 100);
       return () => clearInterval(interval);
     }
@@ -72,30 +72,33 @@ export const TimerCardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
   };
 
   return (
-    <div
+    <article
       className={`border-2 rounded-lg p-4 transition-all ${
         statusColors[timer.status]
       } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+      aria-label={`Timer: ${timer.name}`}
     >
-      <div className="flex items-center justify-between mb-3">
+      <header className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2 flex-1">
           <input
             type="checkbox"
             checked={isSelected}
             onChange={() => dispatch(toggleSelection(timerId))}
             className="w-4 h-4 cursor-pointer"
+            aria-label={`Select ${timer.name}`}
           />
           {isEditing ? (
             <input
               type="text"
               value={editName}
-              onChange={(e) => setEditName(e.target.value)}
+              onChange={(event) => setEditName(event.target.value)}
               onBlur={handleSaveEdit}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSaveEdit();
-                if (e.key === 'Escape') setIsEditing(false);
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') handleSaveEdit();
+                if (event.key === 'Escape') setIsEditing(false);
               }}
-              className="flex-1 px-2 py-1 border rounded"
+              className="flex-1 px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              aria-label="Edit timer name"
               autoFocus
             />
           ) : (
@@ -104,53 +107,68 @@ export const TimerCardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
         </div>
         {!isEditing && (
           <button
+            type="button"
             onClick={() => setIsEditing(true)}
-            className="p-1 hover:bg-gray-200 rounded"
+            className="p-1 hover:bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label={`Edit ${timer.name}`}
           >
             <Edit2 className="w-4 h-4" />
           </button>
         )}
-      </div>
+      </header>
 
-      <div className="text-3xl font-mono text-center mb-4">
+      <div
+        className="text-3xl font-mono text-center mb-4"
+        role="timer"
+        aria-live="off"
+        aria-label={`Elapsed time: ${formatTime(currentElapsed)}`}
+      >
         {formatTime(currentElapsed)}
       </div>
 
       <div className="flex items-center justify-center gap-2">
-        {timer.status !== 'running' ? (
+        {timer.status === 'running' ? (
           <button
-            onClick={() => dispatch(startTimer(timerId))}
-            className="flex items-center gap-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            type="button"
+            onClick={() => dispatch(pauseTimer(timerId))}
+            className="flex items-center gap-1 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            aria-label={`Pause ${timer.name}`}
           >
-            <Play className="w-4 h-4" />
-            Start
+            <Pause className="w-4 h-4" aria-hidden="true" />
+            Pause
           </button>
         ) : (
           <button
-            onClick={() => dispatch(pauseTimer(timerId))}
-            className="flex items-center gap-1 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            type="button"
+            onClick={() => dispatch(startTimer(timerId))}
+            className="flex items-center gap-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            aria-label={`Start ${timer.name}`}
           >
-            <Pause className="w-4 h-4" />
-            Pause
+            <Play className="w-4 h-4" aria-hidden="true" />
+            Start
           </button>
         )}
         <button
+          type="button"
           onClick={() => dispatch(resetTimer(timerId))}
-          className="flex items-center gap-1 px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          className="flex items-center gap-1 px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          aria-label={`Reset ${timer.name}`}
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-4 h-4" aria-hidden="true" />
         </button>
         <button
+          type="button"
           onClick={handleDelete}
-          className="flex items-center gap-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          className="flex items-center gap-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+          aria-label={`Delete ${timer.name}`}
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
 
-      <div className="mt-3 text-xs text-gray-500 text-center">
+      <footer className="mt-3 text-xs text-gray-500 text-center">
         Status: <span className="font-semibold">{timer.status}</span>
-      </div>
-    </div>
+      </footer>
+    </article>
   );
 };

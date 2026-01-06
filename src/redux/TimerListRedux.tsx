@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppSelector } from '../store/hooks';
 import { selectFilteredAndSortedTimers } from '../store/selectors';
-import { TimerCardRedux } from './TimerCardRedux';
+import { CardRedux } from './CardRedux';
 
 export const TimerListRedux: React.FC = () => {
   const timers = useAppSelector(selectFilteredAndSortedTimers);
@@ -20,7 +20,7 @@ export const TimerListRedux: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {timers.map((timer) => (
-        <TimerCardRedux key={timer.id} timerId={timer.id} />
+        <CardRedux key={timer.id} timerId={timer.id} />
       ))}
     </div>
   );

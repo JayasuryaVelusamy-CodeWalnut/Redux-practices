@@ -5,7 +5,7 @@ import { deleteTimer, deleteTimers } from '../store/slices/timersSlice';
 import { removeFromSelection } from '../store/slices/selectionSlice';
 import { AlertCircle, X } from 'lucide-react';
 
-export const ConfirmationModalRedux: React.FC = () => {
+export const ModalRedux: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isOpen, title, message, onConfirmAction, actionPayload } =
     useAppSelector((state) => state.ui.confirmModal);
@@ -13,7 +13,6 @@ export const ConfirmationModalRedux: React.FC = () => {
   if (!isOpen) return null;
 
   const handleConfirm = () => {
-    // Dispatch the appropriate action based on the stored action type
     if (
       onConfirmAction === 'timers/deleteTimer' &&
       typeof actionPayload === 'string'
@@ -36,44 +35,61 @@ export const ConfirmationModalRedux: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+    >
+      <button
+        type="button"
+        className="absolute inset-0 bg-black bg-opacity-50 cursor-default"
         onClick={handleCancel}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') handleCancel();
+        }}
+        aria-label="Close modal backdrop"
+        tabIndex={-1}
       />
 
-      {/* Modal */}
       <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
         <button
+          type="button"
           onClick={handleCancel}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          aria-label="Close dialog"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="flex items-start gap-4">
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0" aria-hidden="true">
             <AlertCircle className="w-6 h-6 text-red-500" />
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-2">{title}</h3>
-            <p className="text-gray-600 mb-6">{message}</p>
+            <h2 id="modal-title" className="text-lg font-semibold mb-2">
+              {title}
+            </h2>
+            <p id="modal-description" className="text-gray-600 mb-6">
+              {message}
+            </p>
 
-            <div className="flex justify-end gap-3">
+            <footer className="flex justify-end gap-3">
               <button
+                type="button"
                 onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleConfirm}
-                className="px-4 py-2 rounded-lg text-white bg-red-500 hover:bg-red-600"
+                className="px-4 py-2 rounded-lg text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 Confirm
               </button>
-            </div>
+            </footer>
           </div>
         </div>
       </div>

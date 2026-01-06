@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import type { Timer } from '../types/timer';
-import { calculateElapsed, formatTime } from '../utils/timerUtils';
+import type { Timer } from '../../../types/timer';
+import { calculateElapsed, formatTime } from '../../../utils/timerUtils';
 import { Play, Pause, RotateCcw, Trash2, Edit2 } from 'lucide-react';
 
 interface TimerCardProps {
@@ -14,7 +14,7 @@ interface TimerCardProps {
   onEdit: (id: string, name: string) => void;
 }
 
-export const TimerCard: React.FC<TimerCardProps> = ({
+export const Card: React.FC<TimerCardProps> = ({
   timer,
   isSelected,
   onToggleSelect,
@@ -28,12 +28,12 @@ export const TimerCard: React.FC<TimerCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(timer.name);
 
-  const currentElapsed = useMemo(() => calculateElapsed(timer), [timer, tick]);
+  const currentElapsed = useMemo(() => calculateElapsed(timer), [timer, tick]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (timer.status === 'running') {
       const interval = setInterval(() => {
-        setTick((t) => t + 1);
+        setTick((previousTick) => previousTick + 1);
       }, 100);
       return () => clearInterval(interval);
     }
@@ -70,11 +70,11 @@ export const TimerCard: React.FC<TimerCardProps> = ({
             <input
               type="text"
               value={editName}
-              onChange={(e) => setEditName(e.target.value)}
+              onChange={(event) => setEditName(event.target.value)}
               onBlur={handleSaveEdit}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSaveEdit();
-                if (e.key === 'Escape') setIsEditing(false);
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') handleSaveEdit();
+                if (event.key === 'Escape') setIsEditing(false);
               }}
               className="flex-1 px-2 py-1 border rounded"
               autoFocus

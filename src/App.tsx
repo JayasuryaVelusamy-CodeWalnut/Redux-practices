@@ -1,4 +1,4 @@
-import { DashboardRedux } from './components/DashboardRedux';
+import { DashboardRedux } from './redux/DashboardRedux';
 import './App.css';
 
 function App() {

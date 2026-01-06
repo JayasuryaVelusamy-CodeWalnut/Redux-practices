@@ -1,7 +1,7 @@
 import type { Timer, DashboardStats } from '../types/timer';
 
 export const generateId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 };
 
 export const createNewTimer = (name: string): Timer => {
@@ -34,8 +34,8 @@ export const formatTime = (milliseconds: number): string => {
 };
 
 export const calculateDashboardStats = (timers: Timer[]): DashboardStats => {
-  const runningTimers = timers.filter((t) => t.status === 'running');
-  const pausedTimers = timers.filter((t) => t.status === 'paused');
+  const runningTimers = timers.filter((timer) => timer.status === 'running');
+  const pausedTimers = timers.filter((timer) => timer.status === 'paused');
 
   const totalElapsed = timers.reduce((sum, timer) => {
     return sum + calculateElapsed(timer);

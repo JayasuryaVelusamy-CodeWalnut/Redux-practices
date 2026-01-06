@@ -37,4 +37,13 @@ export const {
   resetFilters,
 } = filtersSlice.actions;
 
+export const selectFiltersState = (state: { filters: FilterState }) =>
+  state.filters;
+export const selectStatusFilter = (state: { filters: FilterState }) =>
+  state.filters.status;
+export const selectSearchQuery = (state: { filters: FilterState }) =>
+  state.filters.searchQuery;
+export const selectSortBy = (state: { filters: FilterState }) =>
+  state.filters.sortBy;
+
 export default filtersSlice.reducer;

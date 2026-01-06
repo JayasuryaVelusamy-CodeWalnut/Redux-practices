@@ -42,4 +42,10 @@ const uiSlice = createSlice({
 
 export const { openConfirmModal, closeConfirmModal } = uiSlice.actions;
 
+export const selectUIState = (state: { ui: UIState }) => state.ui;
+export const selectConfirmModal = (state: { ui: UIState }) =>
+  state.ui.confirmModal;
+export const selectIsConfirmModalOpen = (state: { ui: UIState }) =>
+  state.ui.confirmModal.isOpen;
+
 export default uiSlice.reducer;

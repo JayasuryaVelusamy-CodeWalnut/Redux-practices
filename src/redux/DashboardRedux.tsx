@@ -9,11 +9,11 @@ import {
 import { fetchTimers } from '../store/thunks/timerThunks';
 import { addTimer } from '../store/slices/timersSlice';
 import { createNewTimer } from '../utils/timerUtils';
-import { StatsPanel } from './StatsPanel';
+import { StatsPanel } from '../components/stats/StatsPanel/StatsPanel';
 import { ControlBarRedux } from './ControlBarRedux';
 import { BulkActionBarRedux } from './BulkActionBarRedux';
 import { TimerListRedux } from './TimerListRedux';
-import { ConfirmationModalRedux } from './ConfirmationModalRedux';
+import { ModalRedux } from './ModalRedux';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 export const DashboardRedux: React.FC = () => {
@@ -45,7 +45,6 @@ export const DashboardRedux: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
         <header className="mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             Timer & Productivity Dashboard
@@ -55,31 +54,31 @@ export const DashboardRedux: React.FC = () => {
           </p>
         </header>
 
-        {/* Error Banner */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500" />
+          <div
+            role="alert"
+            aria-live="polite"
+            className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-500" aria-hidden="true" />
             <span className="text-red-700">{error}</span>
           </div>
         )}
 
-        {/* Stats Panel - uses Redux selector directly */}
-        <StatsPanel stats={stats} />
+        <main>
+          <StatsPanel stats={stats} />
 
-        {/* Control Bar - no props needed for state! */}
-        <ControlBarRedux
-          onCreateTimer={handleCreateTimer}
-          timersCount={filteredTimers.length}
-        />
+          <ControlBarRedux
+            onCreateTimer={handleCreateTimer}
+            timersCount={filteredTimers.length}
+          />
 
-        {/* Bulk Action Bar - uses Redux directly */}
-        <BulkActionBarRedux />
+          <BulkActionBarRedux />
 
-        {/* Timer List - components connect to Redux themselves! */}
-        <TimerListRedux />
+          <TimerListRedux />
+        </main>
 
-        {/* Confirmation Modal - managed by Redux UI state */}
-        <ConfirmationModalRedux />
+        <ModalRedux />
       </div>
     </div>
   );

@@ -8,7 +8,6 @@ export const timerApi = {
   async fetchTimers(): Promise<Timer[]> {
     await delay(MOCK_DELAY);
 
-    // Return mock data or empty array
     const stored = localStorage.getItem('timers');
     if (stored) {
       return JSON.parse(stored);
@@ -23,7 +22,7 @@ export const timerApi = {
     const stored = localStorage.getItem('timers');
     const timers: Timer[] = stored ? JSON.parse(stored) : [];
 
-    const index = timers.findIndex((t) => t.id === id);
+    const index = timers.findIndex((timer) => timer.id === id);
     if (index === -1) {
       throw new Error('Timer not found');
     }
@@ -52,7 +51,7 @@ export const timerApi = {
 
     localStorage.setItem('timers', JSON.stringify(updatedTimers));
 
-    return updatedTimers.filter((t) => ids.includes(t.id));
+    return updatedTimers.filter((timer) => ids.includes(timer.id));
   },
 
   async createTimer(timer: Timer): Promise<Timer> {
@@ -73,7 +72,7 @@ export const timerApi = {
     const stored = localStorage.getItem('timers');
     const timers: Timer[] = stored ? JSON.parse(stored) : [];
 
-    const filtered = timers.filter((t) => !ids.includes(t.id));
+    const filtered = timers.filter((timer) => !ids.includes(timer.id));
     localStorage.setItem('timers', JSON.stringify(filtered));
   },
 };

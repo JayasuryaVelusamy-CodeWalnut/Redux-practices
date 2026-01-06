@@ -12,7 +12,7 @@ interface ConfirmationModalProps {
   isDangerous?: boolean;
 }
 
-export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+export const Modal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   title,
   message,
@@ -26,13 +26,13 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
+      <button
+        type="button"
         className="absolute inset-0 bg-black bg-opacity-50"
         onClick={onCancel}
+        aria-label="Close modal"
       />
 
-      {/* Modal */}
       <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
         <button
           onClick={onCancel}

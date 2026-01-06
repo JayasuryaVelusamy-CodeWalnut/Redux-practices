@@ -16,10 +16,10 @@ const selectionSlice = createSlice({
       const id = action.payload;
       const index = state.selectedIds.indexOf(id);
 
-      if (index !== -1) {
-        state.selectedIds.splice(index, 1);
-      } else {
+      if (index === -1) {
         state.selectedIds.push(id);
+      } else {
+        state.selectedIds.splice(index, 1);
       }
     },
     selectAll: (state, action: PayloadAction<string[]>) => {
@@ -38,5 +38,12 @@ const selectionSlice = createSlice({
 
 export const { toggleSelection, selectAll, deselectAll, removeFromSelection } =
   selectionSlice.actions;
+
+export const selectSelectionState = (state: { selection: SelectionState }) =>
+  state.selection;
+export const selectSelectedIds = (state: { selection: SelectionState }) =>
+  state.selection.selectedIds;
+export const selectSelectedCount = (state: { selection: SelectionState }) =>
+  state.selection.selectedIds.length;
 
 export default selectionSlice.reducer;
