@@ -56,9 +56,7 @@ export const Dashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (timers.length > 0) {
-      localStorage.setItem('timers', JSON.stringify(timers));
-    }
+    localStorage.setItem('timers', JSON.stringify(timers));
   }, [timers]);
 
   const handleCreateTimer = async () => {

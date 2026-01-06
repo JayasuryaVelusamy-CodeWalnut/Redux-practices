@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { closeConfirmModal } from '../store/slices/uiSlice';
 import { deleteTimer, deleteTimers } from '../store/slices/timersSlice';
@@ -9,6 +9,19 @@ export const ModalRedux: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isOpen, title, message, onConfirmAction, actionPayload } =
     useAppSelector((state) => state.ui.confirmModal);
+
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        dispatch(closeConfirmModal());
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [isOpen, dispatch]);
 
   if (!isOpen) return null;
 
@@ -35,24 +48,22 @@ export const ModalRedux: React.FC = () => {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       <button
         type="button"
         className="absolute inset-0 bg-black bg-opacity-50 cursor-default"
         onClick={handleCancel}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') handleCancel();
-        }}
         aria-label="Close modal backdrop"
         tabIndex={-1}
       />
 
-      <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+        className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
+      >
         <button
           type="button"
           onClick={handleCancel}

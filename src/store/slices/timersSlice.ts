@@ -1,5 +1,12 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { Timer } from '../../types/timer';
+import {
+  fetchTimers as fetchTimersThunk,
+  createTimerAsync as createTimerThunk,
+  updateTimerAsync as updateTimerThunk,
+  bulkUpdateTimersAsync as bulkUpdateTimersThunk,
+  deleteTimersAsync as deleteTimersThunk,
+} from '../thunks/timerThunks';
 
 interface TimersState {
   items: Timer[];
@@ -120,7 +127,7 @@ const timersSlice = createSlice({
       })
       .addCase(fetchTimersThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = (action.payload as string) || 'Failed to fetch timers';
+        state.error = action.payload ?? action.error.message ?? 'Failed to fetch timers';
       })
       .addCase(createTimerThunk.pending, (state) => {
         state.isLoading = true;
@@ -131,35 +138,27 @@ const timersSlice = createSlice({
       })
       .addCase(createTimerThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = (action.payload as string) || 'Failed to create timer';
+        state.error = action.payload ?? action.error.message ?? 'Failed to create timer';
       })
       .addCase(updateTimerThunk.fulfilled, (state, action) => {
-        const index = state.items.findIndex((t) => t.id === action.payload.id);
+        const index = state.items.findIndex((timer) => timer.id === action.payload.id);
         if (index !== -1) {
           state.items[index] = action.payload;
         }
       })
       .addCase(bulkUpdateTimersThunk.fulfilled, (state, action) => {
         action.payload.forEach((updatedTimer) => {
-          const index = state.items.findIndex((t) => t.id === updatedTimer.id);
+          const index = state.items.findIndex((timer) => timer.id === updatedTimer.id);
           if (index !== -1) {
             state.items[index] = updatedTimer;
           }
         });
       })
       .addCase(deleteTimersThunk.fulfilled, (state, action) => {
-        state.items = state.items.filter((t) => !action.payload.includes(t.id));
+        state.items = state.items.filter((timer) => !action.payload.includes(timer.id));
       });
   },
 });
-
-import {
-  fetchTimers as fetchTimersThunk,
-  createTimerAsync as createTimerThunk,
-  updateTimerAsync as updateTimerThunk,
-  bulkUpdateTimersAsync as bulkUpdateTimersThunk,
-  deleteTimersAsync as deleteTimersThunk,
-} from '../thunks/timerThunks';
 
 export const {
   addTimer,

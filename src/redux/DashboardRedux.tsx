@@ -23,16 +23,16 @@ export const DashboardRedux: React.FC = () => {
   const stats = useAppSelector(selectDashboardStats);
   const isLoading = useAppSelector(selectTimersLoading);
   const error = useAppSelector(selectTimersError);
+  const totalTimers = useAppSelector((state) => state.timers.items.length);
 
   useEffect(() => {
     dispatch(fetchTimers());
   }, [dispatch]);
 
   const handleCreateTimer = useCallback(() => {
-    const timersCount = filteredTimers.length;
-    const newTimer = createNewTimer(`Timer ${timersCount + 1}`);
+    const newTimer = createNewTimer(`Timer ${totalTimers + 1}`);
     dispatch(addTimer(newTimer));
-  }, [dispatch, filteredTimers.length]);
+  }, [dispatch, totalTimers]);
 
   if (isLoading) {
     return (
@@ -49,34 +49,25 @@ export const DashboardRedux: React.FC = () => {
           <h1 className="text-4xl font-bold text-gray-800 mb-2">
             Timer & Productivity Dashboard
           </h1>
-          <p className="text-green-600 font-semibold">
-            ✅ Phase 2: With Redux - No Prop Drilling! Clean Architecture!
-          </p>
         </header>
 
         {error && (
-          <div
-            role="alert"
-            aria-live="polite"
-            className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg flex items-center gap-3"
-          >
-            <AlertCircle className="w-5 h-5 text-red-500" aria-hidden="true" />
+          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-500" />
             <span className="text-red-700">{error}</span>
           </div>
         )}
 
-        <main>
-          <StatsPanel stats={stats} />
+        <StatsPanel stats={stats} />
 
-          <ControlBarRedux
-            onCreateTimer={handleCreateTimer}
-            timersCount={filteredTimers.length}
-          />
+        <ControlBarRedux
+          onCreateTimer={handleCreateTimer}
+          timersCount={filteredTimers.length}
+        />
 
-          <BulkActionBarRedux />
+        <BulkActionBarRedux />
 
-          <TimerListRedux />
-        </main>
+        <TimerListRedux />
 
         <ModalRedux />
       </div>

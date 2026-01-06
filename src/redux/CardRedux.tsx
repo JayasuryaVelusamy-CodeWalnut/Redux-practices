@@ -27,11 +27,17 @@ export const CardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
 
   const [tick, setTick] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState(timer?.name || '');
+  const [editName, setEditName] = useState('');
+
+  useEffect(() => {
+    if (timer) {
+      setEditName(timer.name);
+    }
+  }, [timer?.id, timer?.name]);
 
   const currentElapsed = useMemo(
     () => (timer ? calculateElapsed(timer) : 0),
-    [timer, tick] // eslint-disable-line react-hooks/exhaustive-deps
+    [timer, tick]
   );
 
   useEffect(() => {
@@ -65,7 +71,7 @@ export const CardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
     );
   };
 
-  const statusColors: Record<string, string> = {
+  const statusColors: Record<'idle' | 'running' | 'paused', string> = {
     idle: 'border-gray-300 bg-white',
     running: 'border-green-500 bg-green-50',
     paused: 'border-yellow-500 bg-yellow-50',

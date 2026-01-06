@@ -28,7 +28,7 @@ export const Card: React.FC<TimerCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(timer.name);
 
-  const currentElapsed = useMemo(() => calculateElapsed(timer), [timer, tick]); // eslint-disable-line react-hooks/exhaustive-deps
+  const currentElapsed = useMemo(() => calculateElapsed(timer), [timer, tick]);
 
   useEffect(() => {
     if (timer.status === 'running') {
@@ -46,7 +46,7 @@ export const Card: React.FC<TimerCardProps> = ({
     setIsEditing(false);
   };
 
-  const statusColors = {
+  const statusColors: Record<'idle' | 'running' | 'paused', string> = {
     idle: 'border-gray-300 bg-white',
     running: 'border-green-500 bg-green-50',
     paused: 'border-yellow-500 bg-yellow-50',

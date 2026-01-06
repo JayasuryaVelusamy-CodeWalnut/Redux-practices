@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { timerApi } from '../../services/timerApi';
 import type { Timer } from '../../types/timer';
 
-export const fetchTimers = createAsyncThunk(
+export const fetchTimers = createAsyncThunk<Timer[], void, { rejectValue: string }>(
   'timers/fetchTimers',
   async (_, { rejectWithValue }) => {
     try {
@@ -16,7 +16,7 @@ export const fetchTimers = createAsyncThunk(
   }
 );
 
-export const createTimerAsync = createAsyncThunk(
+export const createTimerAsync = createAsyncThunk<Timer, Timer, { rejectValue: string }>(
   'timers/createTimer',
   async (timer: Timer, { rejectWithValue }) => {
     try {
@@ -30,7 +30,11 @@ export const createTimerAsync = createAsyncThunk(
   }
 );
 
-export const updateTimerAsync = createAsyncThunk(
+export const updateTimerAsync = createAsyncThunk<
+  Timer,
+  { id: string; updates: Partial<Timer> },
+  { rejectValue: string }
+>(
   'timers/updateTimer',
   async (
     { id, updates }: { id: string; updates: Partial<Timer> },
@@ -47,7 +51,11 @@ export const updateTimerAsync = createAsyncThunk(
   }
 );
 
-export const bulkUpdateTimersAsync = createAsyncThunk(
+export const bulkUpdateTimersAsync = createAsyncThunk<
+  Timer[],
+  { ids: string[]; updates: Partial<Timer> },
+  { rejectValue: string }
+>(
   'timers/bulkUpdate',
   async (
     { ids, updates }: { ids: string[]; updates: Partial<Timer> },
@@ -64,7 +72,7 @@ export const bulkUpdateTimersAsync = createAsyncThunk(
   }
 );
 
-export const deleteTimersAsync = createAsyncThunk(
+export const deleteTimersAsync = createAsyncThunk<string[], string[], { rejectValue: string }>(
   'timers/deleteTimers',
   async (ids: string[], { rejectWithValue }) => {
     try {

@@ -34,13 +34,8 @@ export const Input: React.FC<InputProps> = ({
     : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500';
   const disabledStyles = disabled ? 'bg-gray-100 cursor-not-allowed' : '';
   const widthStyle = fullWidth ? 'w-full' : '';
-
-  let paddingStyles = '';
-  if (leftIcon) {
-    paddingStyles = 'pl-10';
-  } else if (rightIcon) {
-    paddingStyles = 'pr-10';
-  }
+  const leftPadding = leftIcon ? 'pl-10' : '';
+  const rightPadding = rightIcon ? 'pr-10' : '';
 
   let describedBy: string | undefined;
   if (error) {
@@ -79,7 +74,7 @@ export const Input: React.FC<InputProps> = ({
 
         <input
           id={inputId}
-          className={`${baseStyles} ${stateStyles} ${disabledStyles} ${widthStyle} ${paddingStyles} ${className}`}
+          className={`${baseStyles} ${stateStyles} ${disabledStyles} ${widthStyle} ${leftPadding} ${rightPadding} ${className}`}
           disabled={disabled}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={describedBy}
