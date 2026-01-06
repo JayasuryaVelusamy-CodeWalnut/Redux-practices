@@ -2,6 +2,7 @@ import React from 'react';
 import type { FilterState, SortBy, TimerStatus } from '../types/timer';
 import { Search, Plus } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { Button } from './ui';
 
 interface ControlBarProps {
   filters: FilterState;
@@ -18,13 +19,6 @@ export const ControlBar: React.FC<ControlBarProps> = ({
 }) => {
   const { colorTheme } = useTheme();
 
-  const themeColors = {
-    blue: 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700 focus:ring-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700',
-    green:
-      'bg-green-500 hover:bg-green-600 active:bg-green-700 focus:ring-green-500 dark:bg-green-600 dark:hover:bg-green-700',
-    red: 'bg-red-500 hover:bg-red-600 active:bg-red-700 focus:ring-red-500 dark:bg-red-600 dark:hover:bg-red-700',
-  };
-
   const themeInputColors = {
     blue: 'focus:ring-blue-500',
     green: 'focus:ring-green-500',
@@ -32,10 +26,7 @@ export const ControlBar: React.FC<ControlBarProps> = ({
   };
 
   return (
-    <section
-      className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6 shadow-soft"
-      aria-label="Timer controls and filters"
-    >
+    <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6 shadow-soft">
       <div className="flex flex-col md:flex-row gap-4">
         {/* Search */}
         <div className="flex-1">
@@ -106,24 +97,19 @@ export const ControlBar: React.FC<ControlBarProps> = ({
         </div>
 
         {/* Create Button */}
-        <button
+        <Button
           onClick={onCreateTimer}
-          className={`flex items-center justify-center gap-2 px-6 py-2.5 text-white rounded-lg whitespace-nowrap font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-sm ${themeColors[colorTheme]}`}
-          aria-label="Create new timer"
+          variant="primary"
+          leadingIcon={<Plus className="w-5 h-5" />}
+          className="whitespace-nowrap"
         >
-          <Plus className="w-5 h-5" aria-hidden="true" />
-          <span>New Timer</span>
-        </button>
+          New Timer
+        </Button>
       </div>
 
-      <div
-        className="mt-4 text-sm text-gray-600 dark:text-gray-400 font-medium"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
+      <p className="mt-4 text-sm text-gray-600 dark:text-gray-400 font-medium">
         Showing {timersCount} timer{timersCount !== 1 ? 's' : ''}
-      </div>
-    </section>
+      </p>
+    </div>
   );
 };

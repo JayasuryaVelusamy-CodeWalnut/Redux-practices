@@ -19,7 +19,9 @@ All interactive components include appropriate ARIA attributes:
 - Proper `aria-label` and `aria-describedby` attributes
 
 #### TimerCard Component
-- `role="region"` with descriptive `aria-label`
+- Semantic `<article>` element (implicit `role="article"`)
+- `aria-label` for card identification
+- `aria-describedby` linking to status description
 - `role="timer"` for the time display
 - `role="status"` with `aria-live="polite"` for status updates
 - Descriptive button labels with `aria-label`
@@ -29,19 +31,26 @@ All interactive components include appropriate ARIA attributes:
 #### ConfirmationModal Component
 - `role="dialog"` and `aria-modal="true"`
 - `aria-labelledby` and `aria-describedby` for title and description
-- Focus trap implementation
-- Keyboard navigation (Escape to close, Tab to cycle)
-- Auto-focus on cancel button when opened
+- Semantic `<header>` for modal title and description
+- Semantic `<footer>` for action buttons
+- **No focus trap** - allows screen reader users to access browser controls
+- Modal container receives focus (not cancel button) to announce title/description
+- Keyboard navigation (Escape to close)
+- Reusable `Button` component with variants
+- Close button has descriptive `aria-label`
 
 #### ControlBar Component
 - Proper `<label>` elements for all inputs (visible or screen-reader-only)
 - `aria-label` attributes for search, filter, and sort controls
-- `role="status"` with `aria-live="polite"` for result count
+- Reusable `Button` component for creation action
+- Plain `<p>` element for timer count (static text, no live region needed)
 
 #### BulkActionBar Component
-- `role="region"` with descriptive `aria-label`
-- `role="group"` for action buttons
-- Descriptive button labels
+- Descriptive visible text for selection controls
+- `aria-label` for checkbox (dynamically describes state)
+- Reusable `Button` component for all actions with variants
+- Icons marked with `aria-hidden="true"`
+- No redundant ARIA roles or labels on buttons with visible text
 
 #### TimerList Component
 - `role="list"` for the timer grid
@@ -51,13 +60,15 @@ All interactive components include appropriate ARIA attributes:
 - All interactive elements are keyboard accessible
 - Visible focus indicators on all focusable elements
 - Tab order follows logical flow
-- Modal focus trap prevents tabbing outside
+- **No modal focus trap** - screen reader users can access browser controls
 - Escape key closes modals
 - Enter/Escape keys for inline editing
 
 ### 4. **Focus Management**
 - Enhanced focus rings using Tailwind's `focus:ring-2` utilities
 - Focus offset for better visibility: `focus:ring-offset-2`
+- Custom focus styles match the color scheme
+- Modal container focused (not cancel button) to allow screen reader announcement
 - Custom focus styles match the color scheme
 - Focus restored to trigger element after modal closes
 
@@ -84,6 +95,22 @@ All color combinations meet WCAG AA standards:
 - Animations disabled for users who prefer reduced motion
 - Smooth, purposeful transitions
 
+### 9. **ARIA Best Practices**
+Following the **First Rule of ARIA**: Use native HTML semantics whenever possible
+
+**✅ DO:**
+- Use semantic HTML (`<button>`, `<section>`, `<header>`, `<footer>`)
+- Let native elements provide implicit ARIA roles
+- Only add `aria-label` to focusable elements
+- Let button text be announced naturally (no redundant `aria-label`)
+
+**❌ DON'T:**
+- Add `role="region"` to `<section>` (it's redundant)
+- Add `aria-label` to non-focusable `<div>` elements (won't be announced)
+- Duplicate visible text with `aria-label` on buttons
+- Trap screen reader users with modal focus traps
+- Auto-focus buttons before screen reader can announce modal title
+
 ## 🎨 Tailwind CSS Best Practices
 
 ### 1. **Custom Theme Configuration**
@@ -105,10 +132,12 @@ colors: {
 ```
 
 ### 3. **Component Classes**
-Created reusable component classes in `index.css`:
-- `.btn-primary`, `.btn-secondary`, `.btn-success`, `.btn-danger`
+Created reusable `Button` component with variants:
+- `primary`, `secondary`, `success`, `danger`, `ghost`
+- Automatic theme color integration
+- Icon support with proper `aria-hidden` markup
+- Consistent focus rings and hover states
 - `.card` for consistent card styling
-- `.input`, `.select`, `.checkbox` for form controls
 - `.skip-link` for accessibility
 
 ### 4. **Utility-First Approach**
@@ -195,7 +224,7 @@ Recommended tools:
 ## 🔧 Implementation Checklist
 
 ✅ Semantic HTML structure  
-✅ ARIA attributes for all components  
+✅ ARIA attributes for all components (no redundant roles)
 ✅ Keyboard navigation support  
 ✅ Focus management and visible focus indicators  
 ✅ Color contrast compliance  
@@ -203,10 +232,11 @@ Recommended tools:
 ✅ Minimum touch target sizes  
 ✅ Reduced motion support  
 ✅ Custom Tailwind theme with accessible colors  
-✅ Reusable component classes  
+✅ Reusable `Button` component with variants
 ✅ Responsive design  
-✅ Focus trap in modals  
-✅ Descriptive labels and alt text  
+✅ **No focus trap** in modals (screen reader friendly)
+✅ Descriptive labels (no redundant aria-labels)
+✅ Semantic `<header>` and `<footer>` in modals  
 
 ## 📚 Resources
 

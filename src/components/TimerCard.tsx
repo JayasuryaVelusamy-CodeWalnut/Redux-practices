@@ -87,7 +87,6 @@ export const TimerCard: React.FC<TimerCardProps> = ({
       className={`border-2 rounded-xl p-6 transition-all duration-200 ${
         statusColors[timer.status]
       } ${isSelected ? `ring-4 ring-offset-2 ${themeRingColors[colorTheme]}` : ''}`}
-      role="region"
       aria-label={`Timer: ${timer.name}`}
       aria-describedby={`timer-status-${timer.id}`}
     >

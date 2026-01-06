@@ -75,7 +75,7 @@ export const ThemeSwitcher: React.FC = () => {
             aria-label="Theme settings"
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-5">
+            <header className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-2">
                 <Palette
                   className="w-5 h-5 text-gray-700 dark:text-gray-300"
@@ -95,7 +95,7 @@ export const ThemeSwitcher: React.FC = () => {
                   aria-hidden="true"
                 />
               </button>
-            </div>
+            </header>
 
             {/* Dark Mode Toggle */}
             <div className="mb-5">

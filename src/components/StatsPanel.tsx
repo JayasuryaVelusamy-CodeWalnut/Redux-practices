@@ -32,10 +32,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats }) => {
   const currentTheme = themeTotalTimeColors[colorTheme];
 
   return (
-    <section
-      className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6"
-      aria-label="Dashboard statistics"
-    >
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
       <div
         className={`border-2 rounded-xl p-5 shadow-soft hover:shadow-medium transition-shadow ${currentTheme.bg} ${currentTheme.border}`}
       >
@@ -43,10 +40,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats }) => {
           <TimerIcon className="w-5 h-5" aria-hidden="true" />
           <span className="text-sm font-medium">Total Timers</span>
         </div>
-        <div
-          className={`text-3xl font-bold ${currentTheme.text}`}
-          aria-label={`${stats.totalTimers} total timers`}
-        >
+        <div className={`text-3xl font-bold ${currentTheme.text}`}>
           {stats.totalTimers}
         </div>
       </div>
@@ -58,10 +52,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats }) => {
           <Play className="w-5 h-5" aria-hidden="true" />
           <span className="text-sm font-medium">Running</span>
         </div>
-        <div
-          className={`text-3xl font-bold ${currentTheme.text}`}
-          aria-label={`${stats.runningCount} running timers`}
-        >
+        <div className={`text-3xl font-bold ${currentTheme.text}`}>
           {stats.runningCount}
         </div>
       </div>
@@ -73,10 +64,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats }) => {
           <Pause className="w-5 h-5" aria-hidden="true" />
           <span className="text-sm font-medium">Paused</span>
         </div>
-        <div
-          className={`text-3xl font-bold ${currentTheme.text}`}
-          aria-label={`${stats.pausedCount} paused timers`}
-        >
+        <div className={`text-3xl font-bold ${currentTheme.text}`}>
           {stats.pausedCount}
         </div>
       </div>
@@ -88,10 +76,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats }) => {
           <Clock className="w-5 h-5" aria-hidden="true" />
           <span className="text-sm font-medium">Total Time</span>
         </div>
-        <div
-          className={`text-lg font-bold ${currentTheme.text}`}
-          aria-label={`Total elapsed time: ${formatTime(stats.totalElapsed)}`}
-        >
+        <div className={`text-lg font-bold ${currentTheme.text}`}>
           {formatTime(stats.totalElapsed)}
         </div>
       </div>
@@ -103,13 +88,10 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats }) => {
           <Clock className="w-5 h-5" aria-hidden="true" />
           <span className="text-sm font-medium">Longest</span>
         </div>
-        <div
-          className={`text-sm font-bold ${currentTheme.text}`}
-          aria-label={`Longest running timer: ${stats.longestRunningTimer ? stats.longestRunningTimer.name : 'None'}`}
-        >
+        <div className={`text-sm font-bold ${currentTheme.text}`}>
           {stats.longestRunningTimer ? stats.longestRunningTimer.name : 'N/A'}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
