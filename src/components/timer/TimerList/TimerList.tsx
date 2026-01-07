@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Timer, FilterState } from '../../../types/timer';
-import { Card } from '../../common/Card/Card';
+import { TimerCard } from '../../common/Card/Card';
 import { calculateElapsed } from '../../../utils/timerUtils';
 
 interface TimerListProps {
@@ -70,7 +70,7 @@ export const TimerList: React.FC<TimerListProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {sortedTimers.map((timer) => (
-        <Card
+        <TimerCard
           key={timer.id}
           timer={timer}
           isSelected={selectedIds.has(timer.id)}

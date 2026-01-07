@@ -70,9 +70,9 @@ export const Select: React.FC<SelectProps> = ({
         id={selectId}
         className={`${baseStyles} ${stateStyles} ${disabledStyles} ${widthStyle} ${className}`}
         disabled={disabled}
-        aria-invalid={error ? 'true' : 'false'}
+        aria-invalid={!!error}
         aria-describedby={ariaDescribedBy}
-        aria-required={required}
+        aria-required={!!required}
         {...props}
       >
         {placeholder && (

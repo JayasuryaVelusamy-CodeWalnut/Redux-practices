@@ -65,8 +65,11 @@ export const Dashboard: React.FC = () => {
 
     try {
       await timerApi.createTimer(newTimer);
-    } catch {
-      //
+    } catch (error) {
+      setApiState({ isLoading: false, error: 'Failed to create timer' });
+      // Rollback optimistic add
+      dispatch({ type: 'DELETE_TIMER', payload: newTimer.id });
+      console.error('Failed to create timer:', error);
     }
   };
 

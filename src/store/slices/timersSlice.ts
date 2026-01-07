@@ -6,6 +6,7 @@ import {
   updateTimerAsync as updateTimerThunk,
   bulkUpdateTimersAsync as bulkUpdateTimersThunk,
   deleteTimersAsync as deleteTimersThunk,
+  deleteTimerAsync as deleteTimerThunk,
 } from '../thunks/timerThunks';
 
 interface TimersState {
@@ -57,10 +58,9 @@ const timersSlice = createSlice({
 
     startTimer: (state, action: PayloadAction<string>) => {
       const timer = state.items.find((timer) => timer.id === action.payload);
-      if (timer) {
-        timer.status = 'running';
-        timer.startTime = Date.now();
-      }
+      if (!timer || timer.status === 'running') return;
+      timer.status = 'running';
+      timer.startTime = Date.now();
     },
     pauseTimer: (state, action: PayloadAction<string>) => {
       const timer = state.items.find((timer) => timer.id === action.payload);
@@ -127,7 +127,8 @@ const timersSlice = createSlice({
       })
       .addCase(fetchTimersThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload ?? action.error.message ?? 'Failed to fetch timers';
+        state.error =
+          action.payload ?? action.error.message ?? 'Failed to fetch timers';
       })
       .addCase(createTimerThunk.pending, (state) => {
         state.isLoading = true;
@@ -138,24 +139,36 @@ const timersSlice = createSlice({
       })
       .addCase(createTimerThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload ?? action.error.message ?? 'Failed to create timer';
+        state.error =
+          action.payload ?? action.error.message ?? 'Failed to create timer';
       })
       .addCase(updateTimerThunk.fulfilled, (state, action) => {
-        const index = state.items.findIndex((timer) => timer.id === action.payload.id);
+        const index = state.items.findIndex(
+          (timer) => timer.id === action.payload.id
+        );
         if (index !== -1) {
           state.items[index] = action.payload;
         }
       })
       .addCase(bulkUpdateTimersThunk.fulfilled, (state, action) => {
         action.payload.forEach((updatedTimer) => {
-          const index = state.items.findIndex((timer) => timer.id === updatedTimer.id);
+          const index = state.items.findIndex(
+            (timer) => timer.id === updatedTimer.id
+          );
           if (index !== -1) {
             state.items[index] = updatedTimer;
           }
         });
       })
       .addCase(deleteTimersThunk.fulfilled, (state, action) => {
-        state.items = state.items.filter((timer) => !action.payload.includes(timer.id));
+        state.items = state.items.filter(
+          (timer) => !action.payload.includes(timer.id)
+        );
+      })
+      .addCase(deleteTimerThunk.fulfilled, (state, action) => {
+        state.items = state.items.filter(
+          (timer) => timer.id !== action.payload
+        );
       });
   },
 });

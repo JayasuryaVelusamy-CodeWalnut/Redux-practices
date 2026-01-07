@@ -1,96 +1,103 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   startTimer,
   pauseTimer,
   resetTimer,
-  updateTimer,
 } from '../store/slices/timersSlice';
+import { updateTimerAsync } from '../store/thunks/timerThunks';
 import { toggleSelection } from '../store/slices/selectionSlice';
 import { openConfirmModal } from '../store/slices/uiSlice';
+import {
+  makeSelectTimerById,
+  makeSelectIsTimerSelected,
+} from '../store/selectors';
 import { calculateElapsed, formatTime } from '../utils/timerUtils';
 import { Play, Pause, RotateCcw, Trash2, Edit2 } from 'lucide-react';
 
 interface TimerCardReduxProps {
   timerId: string;
+  tick: number;
 }
 
-export const CardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
+export const CardRedux: React.FC<TimerCardReduxProps> = ({ timerId, tick }) => {
   const dispatch = useAppDispatch();
 
-  const timer = useAppSelector((state) =>
-    state.timers.items.find((timer) => timer.id === timerId)
-  );
+  // Create memoized selectors once per component instance
+  const selectTimerById = useMemo(makeSelectTimerById, []);
+  const selectIsTimerSelected = useMemo(makeSelectIsTimerSelected, []);
+
+  const timer = useAppSelector((state) => selectTimerById(state, timerId));
   const isSelected = useAppSelector((state) =>
-    state.selection.selectedIds.includes(timerId)
+    selectIsTimerSelected(state, timerId)
   );
 
-  const [tick, setTick] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
-  const [editName, setEditName] = useState('');
-
-  useEffect(() => {
-    if (timer) {
-      setEditName(timer.name);
-    }
-  }, [timer?.id, timer?.name]);
+  const [editName, setEditName] = useState(timer?.name ?? '');
 
   const currentElapsed = useMemo(
     () => (timer ? calculateElapsed(timer) : 0),
+    // tick is intentionally included to trigger recalculation on running timers
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [timer, tick]
   );
-
-  useEffect(() => {
-    if (timer?.status === 'running') {
-      const interval = setInterval(() => {
-        setTick((previousTick) => previousTick + 1);
-      }, 100);
-      return () => clearInterval(interval);
-    }
-  }, [timer?.status]);
 
   if (!timer) return null;
 
   const handleSaveEdit = () => {
     if (editName.trim()) {
       dispatch(
-        updateTimer({ id: timerId, updates: { name: editName.trim() } })
+        updateTimerAsync({ id: timerId, updates: { name: editName.trim() } })
       );
+    } else {
+      setEditName(timer?.name ?? '');
     }
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditName(timer?.name ?? '');
     setIsEditing(false);
   };
 
   const handleDelete = () => {
     dispatch(
       openConfirmModal({
+        isOpen: true,
         title: 'Delete Timer',
         message: 'Are you sure you want to delete this timer?',
-        onConfirmAction: 'timers/deleteTimer',
-        actionPayload: timerId,
+        kind: 'deleteOne',
+        timerId: timerId,
       })
     );
   };
 
   const statusColors: Record<'idle' | 'running' | 'paused', string> = {
-    idle: 'border-gray-300 bg-white',
-    running: 'border-green-500 bg-green-50',
-    paused: 'border-yellow-500 bg-yellow-50',
+    idle: 'border-blue-200 bg-white',
+    running: 'border-green-400 bg-gradient-to-br from-green-50 to-emerald-50',
+    paused: 'border-yellow-400 bg-gradient-to-br from-yellow-50 to-amber-50',
+  };
+
+  const statusBadge: Record<'idle' | 'running' | 'paused', string> = {
+    idle: 'bg-blue-100 text-blue-700',
+    running: 'bg-green-100 text-green-700',
+    paused: 'bg-yellow-100 text-yellow-700',
   };
 
   return (
     <article
-      className={`border-2 rounded-lg p-4 transition-all ${
+      className={`border-2 rounded-xl p-4 sm:p-6 transition-all duration-300 shadow-md hover:shadow-xl ${
         statusColors[timer.status]
-      } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+      } ${isSelected ? 'ring-4 ring-blue-400 ring-opacity-50 shadow-blue-200' : ''}`}
       aria-label={`Timer: ${timer.name}`}
     >
-      <header className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2 flex-1">
+      <header className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1">
           <input
             type="checkbox"
             checked={isSelected}
             onChange={() => dispatch(toggleSelection(timerId))}
-            className="w-4 h-4 cursor-pointer"
+            className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer text-blue-600 rounded focus:ring-2 focus:ring-blue-500 flex-shrink-0"
             aria-label={`Select ${timer.name}`}
           />
           {isEditing ? (
@@ -101,79 +108,87 @@ export const CardRedux: React.FC<TimerCardReduxProps> = ({ timerId }) => {
               onBlur={handleSaveEdit}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') handleSaveEdit();
-                if (event.key === 'Escape') setIsEditing(false);
+                if (event.key === 'Escape') handleCancelEdit();
               }}
-              className="flex-1 px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white font-semibold text-gray-800 text-sm sm:text-base"
               aria-label="Edit timer name"
               autoFocus
             />
           ) : (
-            <h3 className="text-lg font-semibold flex-1">{timer.name}</h3>
+            <h3 className="text-base sm:text-xl font-bold flex-1 text-gray-800 truncate">
+              {timer.name}
+            </h3>
           )}
         </div>
         {!isEditing && (
           <button
             type="button"
             onClick={() => setIsEditing(true)}
-            className="p-1 hover:bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-2 hover:bg-blue-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
             aria-label={`Edit ${timer.name}`}
           >
-            <Edit2 className="w-4 h-4" />
+            <Edit2 className="w-5 h-5 text-blue-600" />
           </button>
         )}
       </header>
 
-      <div
-        className="text-3xl font-mono text-center mb-4"
-        role="timer"
-        aria-live="off"
-        aria-label={`Elapsed time: ${formatTime(currentElapsed)}`}
-      >
-        {formatTime(currentElapsed)}
+      <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-4 sm:p-6 mb-3 sm:mb-4 shadow-inner">
+        <div
+          className="text-3xl sm:text-4xl md:text-5xl font-mono text-center text-white font-bold tracking-wider"
+          role="timer"
+          aria-live="off"
+          aria-label={`Elapsed time: ${formatTime(currentElapsed)}`}
+        >
+          {formatTime(currentElapsed)}
+        </div>
       </div>
 
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap">
         {timer.status === 'running' ? (
           <button
             type="button"
             onClick={() => dispatch(pauseTimer(timerId))}
-            className="flex items-center gap-1 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 font-semibold text-sm sm:text-base"
             aria-label={`Pause ${timer.name}`}
           >
-            <Pause className="w-4 h-4" aria-hidden="true" />
+            <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
             Pause
           </button>
         ) : (
           <button
             type="button"
             onClick={() => dispatch(startTimer(timerId))}
-            className="flex items-center gap-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold text-sm sm:text-base"
             aria-label={`Start ${timer.name}`}
           >
-            <Play className="w-4 h-4" aria-hidden="true" />
+            <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
             Start
           </button>
         )}
         <button
           type="button"
           onClick={() => dispatch(resetTimer(timerId))}
-          className="flex items-center gap-1 px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-gray-500 to-slate-500 text-white rounded-lg hover:from-gray-600 hover:to-slate-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium text-sm sm:text-base"
           aria-label={`Reset ${timer.name}`}
         >
-          <RotateCcw className="w-4 h-4" aria-hidden="true" />
+          <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
         </button>
         <button
           type="button"
           onClick={handleDelete}
-          className="flex items-center gap-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-lg hover:from-red-600 hover:to-rose-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-sm sm:text-base"
           aria-label={`Delete ${timer.name}`}
         >
-          <Trash2 className="w-4 h-4" aria-hidden="true" />
+          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
         </button>
       </div>
 
-      <footer className="mt-3 text-xs text-gray-500 text-center">
-        Status: <span className="font-semibold">{timer.status}</span>
+      <footer className="mt-4 text-center">
+        <span
+          className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide ${statusBadge[timer.status]}`}
+        >
+          {timer.status}
+        </span>
       </footer>
     </article>
   );

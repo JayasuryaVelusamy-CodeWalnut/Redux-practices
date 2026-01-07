@@ -38,32 +38,33 @@ export const BulkActionBarRedux: React.FC = () => {
   const handleBulkDelete = () => {
     dispatch(
       openConfirmModal({
+        isOpen: true,
         title: 'Delete Multiple Timers',
         message: `Are you sure you want to delete ${selectedCount} timer(s)?`,
-        onConfirmAction: 'timers/deleteTimers',
-        actionPayload: selectedIds,
+        kind: 'deleteMany',
+        timerIds: selectedIds,
       })
     );
   };
 
   return (
     <section
-      className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6"
+      className="bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 rounded-xl shadow-lg p-4 sm:p-5 mb-6 sm:mb-8"
       aria-label="Bulk actions"
     >
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto">
+          <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm">
             <input
               type="checkbox"
               checked={isAllSelected}
               onChange={isAllSelected ? handleDeselectAll : handleSelectAll}
-              className="w-4 h-4 cursor-pointer"
+              className="w-5 h-5 cursor-pointer text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
               aria-label={
                 isAllSelected ? 'Deselect all timers' : 'Select all timers'
               }
             />
-            <span className="font-semibold">
+            <span className="font-bold text-blue-900">
               {selectedCount} of {totalCount} selected
             </span>
           </div>
@@ -71,57 +72,62 @@ export const BulkActionBarRedux: React.FC = () => {
             <button
               type="button"
               onClick={handleSelectAll}
-              className="text-sm text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              className="text-sm font-semibold text-blue-700 hover:text-blue-900 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-3 py-1"
             >
-              Select all
+              ✓ Select all
             </button>
           )}
           {selectedCount > 0 && (
             <button
               type="button"
               onClick={handleDeselectAll}
-              className="text-sm text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              className="text-sm font-semibold text-blue-700 hover:text-blue-900 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-3 py-1"
             >
-              Deselect all
+              ✗ Clear selection
             </button>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
           <button
             type="button"
             onClick={() => dispatch(startAllTimers())}
-            className="flex items-center gap-1 px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 font-medium text-xs sm:text-sm"
             aria-label="Start all selected timers"
           >
-            <Play className="w-4 h-4" aria-hidden="true" />
-            Start All
+            <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
+            <span className="hidden xs:inline">Start All</span>
+            <span className="xs:hidden">Start</span>
           </button>
           <button
             type="button"
             onClick={() => dispatch(pauseAllTimers())}
-            className="flex items-center gap-1 px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-yellow-500 to-amber-500 text-white rounded-lg hover:from-yellow-600 hover:to-amber-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 font-medium text-xs sm:text-sm"
             aria-label="Pause all selected timers"
           >
-            <Pause className="w-4 h-4" aria-hidden="true" />
-            Pause All
+            <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
+            <span className="hidden xs:inline">Pause All</span>
+            <span className="xs:hidden">Pause</span>
           </button>
           <button
             type="button"
             onClick={() => dispatch(resetAllTimers())}
-            className="flex items-center gap-1 px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm"
+            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-gray-500 to-slate-500 text-white rounded-lg hover:from-gray-600 hover:to-slate-600 shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 font-medium text-xs sm:text-sm"
             aria-label="Reset all selected timers"
           >
-            <RotateCcw className="w-4 h-4" aria-hidden="true" />
+            <RotateCcw
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+              aria-hidden="true"
+            />
             Reset
           </button>
           <button
             type="button"
             onClick={handleBulkDelete}
-            className="flex items-center gap-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+            className="flex items-center gap-1 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs sm:text-sm font-medium"
             aria-label="Delete all selected timers"
           >
-            <Trash2 className="w-4 h-4" aria-hidden="true" />
+            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" aria-hidden="true" />
             Delete
           </button>
         </div>

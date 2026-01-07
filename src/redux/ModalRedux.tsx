@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { closeConfirmModal } from '../store/slices/uiSlice';
-import { deleteTimer, deleteTimers } from '../store/slices/timersSlice';
+import {
+  deleteTimerAsync,
+  deleteTimersAsync,
+} from '../store/thunks/timerThunks';
 import { removeFromSelection } from '../store/slices/selectionSlice';
 import { AlertCircle, X } from 'lucide-react';
 
 export const ModalRedux: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { isOpen, title, message, onConfirmAction, actionPayload } =
-    useAppSelector((state) => state.ui.confirmModal);
+  const confirmModal = useAppSelector((state) => state.ui.confirmModal);
 
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -17,27 +19,30 @@ export const ModalRedux: React.FC = () => {
       }
     };
 
-    if (isOpen) {
+    if (confirmModal.isOpen) {
       document.addEventListener('keydown', handleEscapeKey);
     }
     return () => document.removeEventListener('keydown', handleEscapeKey);
-  }, [isOpen, dispatch]);
+  }, [confirmModal.isOpen, dispatch]);
 
-  if (!isOpen) return null;
+  if (!confirmModal.isOpen) return null;
 
   const handleConfirm = () => {
-    if (
-      onConfirmAction === 'timers/deleteTimer' &&
-      typeof actionPayload === 'string'
-    ) {
-      dispatch(deleteTimer(actionPayload));
-      dispatch(removeFromSelection([actionPayload]));
-    } else if (
-      onConfirmAction === 'timers/deleteTimers' &&
-      Array.isArray(actionPayload)
-    ) {
-      dispatch(deleteTimers(actionPayload));
-      dispatch(removeFromSelection(actionPayload));
+    // Exhaustive type-safe handling based on discriminated union
+    switch (confirmModal.kind) {
+      case 'deleteOne':
+        dispatch(deleteTimerAsync(confirmModal.timerId));
+        dispatch(removeFromSelection([confirmModal.timerId]));
+        break;
+      case 'deleteMany':
+        dispatch(deleteTimersAsync(confirmModal.timerIds));
+        dispatch(removeFromSelection(confirmModal.timerIds));
+        break;
+      default: {
+        // Exhaustiveness check - will error if we miss a case
+        const _exhaustive: never = confirmModal;
+        return _exhaustive;
+      }
     }
 
     dispatch(closeConfirmModal());
@@ -48,10 +53,10 @@ export const ModalRedux: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
       <button
         type="button"
-        className="absolute inset-0 bg-black bg-opacity-50 cursor-default"
+        className="absolute inset-0 bg-black bg-opacity-60 cursor-default transition-opacity duration-300"
         onClick={handleCancel}
         aria-label="Close modal backdrop"
         tabIndex={-1}
@@ -62,41 +67,50 @@ export const ModalRedux: React.FC = () => {
         aria-modal="true"
         aria-labelledby="modal-title"
         aria-describedby="modal-description"
-        className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
+        className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 animate-[scale-in_0.2s_ease-out] border-2 border-blue-100"
       >
         <button
           type="button"
           onClick={handleCancel}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
           aria-label="Close dialog"
         >
-          <X className="w-5 h-5" />
+          <X className="w-6 h-6" />
         </button>
 
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0" aria-hidden="true">
-            <AlertCircle className="w-6 h-6 text-red-500" />
+        <div className="flex items-start gap-5">
+          <div
+            className="flex-shrink-0 bg-red-100 p-3 rounded-xl"
+            aria-hidden="true"
+          >
+            <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
           <div className="flex-1">
-            <h2 id="modal-title" className="text-lg font-semibold mb-2">
-              {title}
+            <h2
+              id="modal-title"
+              className="text-2xl font-bold mb-3 text-gray-900"
+            >
+              {confirmModal.title}
             </h2>
-            <p id="modal-description" className="text-gray-600 mb-6">
-              {message}
+            <p
+              id="modal-description"
+              className="text-gray-600 mb-8 text-base leading-relaxed"
+            >
+              {confirmModal.message}
             </p>
 
             <footer className="flex justify-end gap-3">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-gray-700 transition-all duration-200"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleConfirm}
-                className="px-4 py-2 rounded-lg text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="px-6 py-3 rounded-xl text-white bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 font-semibold transition-all duration-200"
               >
                 Confirm
               </button>

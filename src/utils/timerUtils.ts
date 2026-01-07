@@ -1,7 +1,7 @@
 import type { Timer, DashboardStats } from '../types/timer';
 
 export const generateId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+  return crypto.randomUUID();
 };
 
 export const createNewTimer = (name: string): Timer => {

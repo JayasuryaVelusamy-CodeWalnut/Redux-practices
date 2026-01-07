@@ -1,24 +1,33 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { RootState } from '../index';
 
-interface ConfirmModalState {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  onConfirmAction: string | null; // Action type to dispatch on confirm
-  actionPayload?: unknown;
-}
+type ConfirmModalState =
+  | { isOpen: false }
+  | {
+      isOpen: true;
+      title: string;
+      message: string;
+      kind: 'deleteOne';
+      timerId: string;
+    }
+  | {
+      isOpen: true;
+      title: string;
+      message: string;
+      kind: 'deleteMany';
+      timerIds: string[];
+    };
 
 interface UIState {
   confirmModal: ConfirmModalState;
+  nowMs: number;
 }
 
 const initialState: UIState = {
   confirmModal: {
     isOpen: false,
-    title: '',
-    message: '',
-    onConfirmAction: null,
   },
+  nowMs: Date.now(),
 };
 
 const uiSlice = createSlice({
@@ -27,25 +36,25 @@ const uiSlice = createSlice({
   reducers: {
     openConfirmModal: (
       state,
-      action: PayloadAction<Omit<ConfirmModalState, 'isOpen'>>
+      action: PayloadAction<Exclude<ConfirmModalState, { isOpen: false }>>
     ) => {
-      state.confirmModal = {
-        ...action.payload,
-        isOpen: true,
-      };
+      state.confirmModal = action.payload;
     },
     closeConfirmModal: (state) => {
-      state.confirmModal = initialState.confirmModal;
+      state.confirmModal = { isOpen: false };
+    },
+    tickNow: (state) => {
+      state.nowMs = Date.now();
     },
   },
 });
 
-export const { openConfirmModal, closeConfirmModal } = uiSlice.actions;
+export const { openConfirmModal, closeConfirmModal, tickNow } = uiSlice.actions;
 
-export const selectUIState = (state: { ui: UIState }) => state.ui;
-export const selectConfirmModal = (state: { ui: UIState }) =>
-  state.ui.confirmModal;
-export const selectIsConfirmModalOpen = (state: { ui: UIState }) =>
+export const selectUIState = (state: RootState) => state.ui;
+export const selectConfirmModal = (state: RootState) => state.ui.confirmModal;
+export const selectNowMs = (state: RootState) => state.ui.nowMs;
+export const selectIsConfirmModalOpen = (state: RootState) =>
   state.ui.confirmModal.isOpen;
 
 export default uiSlice.reducer;

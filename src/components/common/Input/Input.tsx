@@ -76,9 +76,9 @@ export const Input: React.FC<InputProps> = ({
           id={inputId}
           className={`${baseStyles} ${stateStyles} ${disabledStyles} ${widthStyle} ${leftPadding} ${rightPadding} ${className}`}
           disabled={disabled}
-          aria-invalid={error ? 'true' : 'false'}
+          aria-invalid={!!error}
           aria-describedby={describedBy}
-          aria-required={required}
+          aria-required={!!required}
           {...props}
         />
 

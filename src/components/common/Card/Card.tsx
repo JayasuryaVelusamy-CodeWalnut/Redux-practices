@@ -14,7 +14,7 @@ interface TimerCardProps {
   onEdit: (id: string, name: string) => void;
 }
 
-export const Card: React.FC<TimerCardProps> = ({
+export const TimerCard: React.FC<TimerCardProps> = ({
   timer,
   isSelected,
   onToggleSelect,
@@ -28,7 +28,12 @@ export const Card: React.FC<TimerCardProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(timer.name);
 
-  const currentElapsed = useMemo(() => calculateElapsed(timer), [timer, tick]);
+  const currentElapsed = useMemo(
+    () => calculateElapsed(timer),
+    // tick is intentionally included to trigger recalculation on running timers
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [timer, tick]
+  );
 
   useEffect(() => {
     if (timer.status === 'running') {

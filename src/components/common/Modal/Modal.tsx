@@ -70,8 +70,12 @@ export const Modal: React.FC<ConfirmationModalProps> = ({
             </div>
           )}
           <div className="flex-1">
-            <h3 id="confirmation-title" className="text-lg font-semibold mb-2">{title}</h3>
-            <p id="confirmation-message" className="text-gray-600 mb-6">{message}</p>
+            <h3 id="confirmation-title" className="text-lg font-semibold mb-2">
+              {title}
+            </h3>
+            <p id="confirmation-message" className="text-gray-600 mb-6">
+              {message}
+            </p>
 
             <div className="flex justify-end gap-3">
               <button

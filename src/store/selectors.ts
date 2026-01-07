@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 import type { RootState } from './index';
 import type { Timer } from '../types/timer';
 import { calculateElapsed, calculateDashboardStats } from '../utils/timerUtils';
+import { selectNowMs } from './slices/uiSlice';
 
 export const selectTimers = (state: RootState) => state.timers.items;
 export const selectFilters = (state: RootState) => state.filters;
@@ -11,7 +12,7 @@ export const selectTimersLoading = (state: RootState) => state.timers.isLoading;
 export const selectTimersError = (state: RootState) => state.timers.error;
 
 export const selectFilteredAndSortedTimers = createSelector(
-  [selectTimers, selectFilters],
+  [selectTimers, selectFilters, selectNowMs],
   (timers: Timer[], filters: ReturnType<typeof selectFilters>) => {
     const filtered = timers.filter((timer) => {
       if (filters.status !== 'all' && timer.status !== filters.status) {
@@ -46,7 +47,7 @@ export const selectFilteredAndSortedTimers = createSelector(
 );
 
 export const selectDashboardStats = createSelector(
-  [selectTimers],
+  [selectTimers, selectNowMs],
   (timers: Timer[]) => {
     return calculateDashboardStats(timers);
   }
@@ -65,3 +66,17 @@ export const selectSelectedTimers = createSelector(
     return timers.filter((timer) => selectedIds.includes(timer.id));
   }
 );
+
+// Memoized selector factory for finding a timer by ID
+export const makeSelectTimerById = () =>
+  createSelector(
+    [selectTimers, (_state: RootState, timerId: string) => timerId],
+    (timers, timerId) => timers.find((timer) => timer.id === timerId)
+  );
+
+// Memoized selector factory for checking if a timer is selected
+export const makeSelectIsTimerSelected = () =>
+  createSelector(
+    [selectSelectedIds, (_state: RootState, timerId: string) => timerId],
+    (selectedIds, timerId) => selectedIds.includes(timerId)
+  );

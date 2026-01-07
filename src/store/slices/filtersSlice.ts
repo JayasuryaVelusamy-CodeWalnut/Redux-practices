@@ -24,7 +24,7 @@ const filtersSlice = createSlice({
       return action.payload;
     },
     resetFilters: () => {
-      return initialState;
+      return { ...initialState };
     },
   },
 });
@@ -37,13 +37,12 @@ export const {
   resetFilters,
 } = filtersSlice.actions;
 
-export const selectFiltersState = (state: { filters: FilterState }) =>
-  state.filters;
-export const selectStatusFilter = (state: { filters: FilterState }) =>
-  state.filters.status;
-export const selectSearchQuery = (state: { filters: FilterState }) =>
+import type { RootState } from '../index';
+
+export const selectFiltersState = (state: RootState) => state.filters;
+export const selectStatusFilter = (state: RootState) => state.filters.status;
+export const selectSearchQuery = (state: RootState) =>
   state.filters.searchQuery;
-export const selectSortBy = (state: { filters: FilterState }) =>
-  state.filters.sortBy;
+export const selectSortBy = (state: RootState) => state.filters.sortBy;
 
 export default filtersSlice.reducer;
